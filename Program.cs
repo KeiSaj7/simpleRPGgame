@@ -42,7 +42,7 @@ namespace SimpleConsoleAppGame
             Console.Clear();
             Console.WriteLine($"You've chosen {chosenRace} race. Your basic statistics:" );
             character.PrintStats();
-            character.ShowInventory();
+           // character.ShowInventory();
             Console.WriteLine("Press any key to start the adventure...");
             Console.ReadKey();
             Console.Clear();

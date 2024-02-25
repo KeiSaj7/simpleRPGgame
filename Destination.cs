@@ -11,7 +11,8 @@ namespace SimpleConsoleAppGame
         public string Name { get; set; }
         public int Stage { get; set; }
         public Dictionary<string, string> Directions { get; set; }
-        public Dictionary<string, int> Items { get; set; }
+        public List<Item> Items { get; set; }
+        // public Dictionary<string, int> Items { get; set; }
         public Dictionary<string, int> RewardOdds { get; set; }
         public Dictionary<int, Enemy> Enemies { get; set; }
 
@@ -59,36 +60,43 @@ namespace SimpleConsoleAppGame
         }
 
         public void Fight(Character character)
-        {
+        {   if (this.Stage == 3)
+            {
+                Console.WriteLine("You have defeated the Dark Wizard and saved the kingdom! Congratulations!");
+                Console.ReadKey();
+                Environment.Exit(0);
+            }
             Console.WriteLine($"You have encountered the {this.Enemies[Stage].Name}, prepare yourself to fight!\n");
             Console.WriteLine("Press any key to start the battle...");
             Console.ReadKey();
             Console.Clear();
-            var characterStats = character.GetStats();
             while (true)
             {   
-                int currHealth = character.GetCurrHealth();
+                var HPs = CalcHealth(character);
+                Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0? 0 : HPs.Item1)}%");
+                FightChoice(character);
                 if (this.Enemies[Stage].CurrentHealth <= 0)
                 {
+                    HPs = CalcHealth(character);
+                    Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0 ? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0 ? 0 : HPs.Item1)}%");
+                    Console.WriteLine("You have slain an enemy!\n");
                     if (this.Stage == 2) GetReward(character);
                     this.Stage++;
-                    Console.WriteLine("You have slain an enemy!\n");
                     Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                     Console.Clear();
                     break;
                 }
-                if (currHealth <= 0)
+                this.Enemies[Stage].AttackEnemy(character, character.GetName(), character.GetDefense());
+                if (HPs.Item3 <= 0)
                 {
+                    HPs = CalcHealth(character);
+                    Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0 ? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0 ? 0 : HPs.Item1)}%");
                     Console.WriteLine($"You have been defeated by {this.Enemies[Stage].Name}! What a shame...\nTHE END");
                     Console.ReadKey();
                     Environment.Exit(0);
                 }
-                int charHP = (currHealth * 100) / characterStats.Item2;
-                int enemyHP = (this.Enemies[Stage].CurrentHealth * 100) / this.Enemies[Stage].Health;
-                Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(enemyHP)} {enemyHP}%               " +characterStats.Item1+ $" {PrintHealthBar(charHP)} {charHP}%");
-                FightChoice(character);
-                this.Enemies[Stage].AttackEnemy(character, characterStats.Item1, characterStats.Item4);
+                
                 
             }
             Choices(character);
@@ -102,7 +110,7 @@ namespace SimpleConsoleAppGame
             {
                 Console.WriteLine("Invalid choice, please try again.");
             }
-            switch (choice)
+            switch (choice) 
             {
                 case 1:
                     Console.Clear();
@@ -114,6 +122,13 @@ namespace SimpleConsoleAppGame
                     break;
             }
         }
+        public (int,int,int) CalcHealth(Character character)
+        {
+            int currHealth = character.GetCurrHealth();
+            int charHP = (currHealth * 100) / character.GetMaxHealth();
+            int enemyHP = (this.Enemies[Stage].CurrentHealth * 100) / this.Enemies[Stage].Health;
+            return (charHP,enemyHP,currHealth);
+        }
         public string PrintHealthBar(int health)
         {
             int bars = health / 10;
@@ -123,17 +138,18 @@ namespace SimpleConsoleAppGame
         public void GetReward(Character character)
         {
             Console.WriteLine("Your enemy dropped an item...");
-            var reward = new List<string>();
-            foreach (var item in this.RewardOdds)
+            var rewards = new List<string>();
+            foreach (var item in this.Items)
             {
-                for (int i = 0; i < item.Value; i++)
+                for (int i = 0; i < item.Odd; i++)
                 {
-                    reward.Add(item.Key);
+                    rewards.Add(item.Name);
                 }
             }   
-            string random = reward[new Random().Next(reward.Count)];
-            character.AddItem(random, this.Items[random]);
-            Console.WriteLine($"You have received {random}!");
+            string random = rewards[new Random().Next(rewards.Count)];
+            Item reward = this.Items.Find(x => x.Name == random);
+            character.AddItem(reward);
+            Console.WriteLine($"You have received {reward.Name}!");
         }
     }
     public class Enemy
@@ -152,7 +168,7 @@ namespace SimpleConsoleAppGame
             this.Defense = defense;
             this.CritChance = critChance;
         }
-        public void AttackEnemy(Character character, string enemyName, int enemyDef)
+        public virtual void AttackEnemy(Character character, string enemyName, int enemyDef)
         {
             int damage = this.Attack - enemyDef;
             if (damage <= 0)
@@ -174,6 +190,29 @@ namespace SimpleConsoleAppGame
         public Boss(string name, int health, int attack, int defense, int critChance, Dictionary<string, Tuple<int, int>> specialAbility) : base(name, health, attack, defense, critChance)
         {
             this.SpecialAbility = specialAbility;
+        }
+        public override void AttackEnemy(Character character, string enemyName, int enemyDef)
+        {
+            int damage;
+            if (new Random().Next(1, 101) <= this.SpecialAbility.First().Value.Item2)
+            {
+                damage = this.SpecialAbility.First().Value.Item1 - enemyDef;
+                character.SetCurrHealth(damage);
+                Console.WriteLine($"{this.Name} used {this.SpecialAbility.First().Key} and dealt {damage} damage!");
+                return;
+            }
+            damage = this.Attack - enemyDef;
+            if (damage <= 0)
+            {
+                Console.WriteLine($"{this.Name} attack blocked!");
+                return;
+            }
+            if (new Random().Next(1, 101) <= this.CritChance)
+            {
+                damage *= 2;
+            }
+            character.SetCurrHealth(damage);
+            Console.WriteLine($"{this.Name} attacked {enemyName} for {damage} damage!");
         }
     }
 }
