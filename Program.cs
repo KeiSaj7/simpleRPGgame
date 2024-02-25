@@ -47,7 +47,7 @@ namespace SimpleConsoleAppGame
             Console.ReadKey();
             Console.Clear();
             DarkForest destination1 = new DarkForest();
-            Console.WriteLine($"Your first deistination is {destination1.Name}. Kill all enemies to complete this level. \nPress any key to enter the forest...");
+            Console.WriteLine($"Your first deistination is {destination1.Name}. Kill all enemies to complete this level. \n\nPress any key to enter the forest...");
             Console.ReadKey();
             destination1.StartLevel(character);
         }

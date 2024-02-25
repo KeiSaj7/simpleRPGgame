@@ -42,9 +42,13 @@ namespace SimpleConsoleAppGame
         {
             return this.CurrentHealth -= damage;
         }
+        public void AddItem(string item, int value)
+        {
+            Inventory.Add(item, value);
+        }   
         public void PrintStats()
         {
-            Console.WriteLine($"Name: {Name}\nHealth: {Health}\nAttack: {Attack}\nDefense: {Defense}\nCritChance: {CritChance}%\n");
+            Console.WriteLine($"Name: {Name}\nMaxHealth: {Health}\nCurrentHealth: {CurrentHealth}\nAttack: {Attack}\nDefense: {Defense}\nCritChance: {CritChance}%\n");
         }
         public void ShowInventory()
         {
