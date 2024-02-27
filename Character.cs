@@ -16,6 +16,7 @@ namespace SimpleConsoleAppGame
         protected int CritChance { get; set; }
         protected string MainHand { get; set; }
         protected string Armor { get; set; }
+        protected int Gold { get; set; }    
         //protected Dictionary<string, int>? Inventory { get; set; }
         protected List<Item> Inventory { get; set; }
 
@@ -51,9 +52,13 @@ namespace SimpleConsoleAppGame
         {
             return this.CurrentHealth;
         }   
-        public int SetCurrHealth(int damage)
+        public void SetCurrHealth(int damage)
         {
-            return this.CurrentHealth -= damage;
+            this.CurrentHealth -= damage;
+            if(this.CurrentHealth > this.Health)
+            {
+                this.CurrentHealth = this.Health;
+            }
         }
         public void AddItem(Item item)
         {
@@ -68,32 +73,76 @@ namespace SimpleConsoleAppGame
             string inventory = "Inventory:\n";
             for(int i = 0; i < Inventory.Count; i++)
             {
-                if(Inventory.ElementAt(i).Name == this.MainHand) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} [Main Hand]\n";
-                else if(Inventory.ElementAt(i).Name == this.Armor) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} [Armor]\n";
+                if(Inventory.ElementAt(i).Name == this.MainHand) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Main Hand]\n";
+                else if(Inventory.ElementAt(i).Name == this.Armor) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Armor]\n";
                 else
                 {
-                    inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value}\n";
+                    inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold\n";
 
                 }
             }
-
             Console.WriteLine(inventory);
+        }
+        public int GetInventoryQuantity()
+        {
+            return Inventory.Count;
+        }
+        public void ShowGold()
+        {
+            Console.WriteLine($"Your gold balance: {this.Gold}\n");
+        }   
+        public bool UseItem()
+        {
             Console.Write("Select an item to use/equip (type 0 to leave): ");
             int chosenIdx;
             while (!int.TryParse(Console.ReadLine(), out chosenIdx) || chosenIdx < 0 || chosenIdx > Inventory.Count)
             {
+                Console.Clear();
                 Console.WriteLine("Invalid choice, please try again.");
             }
-            if(chosenIdx == 0)
+            if (chosenIdx == 0)
             {
-                return;
+                return false;
             }
             Item selectedItem = Inventory[chosenIdx - 1];
             selectedItem.Use(this);
+            return true;
         }
         public void RemoveItem(Item item)
         {
                Inventory.Remove(item);
+        }
+        public bool BuyItem(Item item)
+        {
+            if (this.Gold < item.Price)
+            {
+                Console.WriteLine("You don't have enough gold to buy this item.");
+                return false;
+            }
+            this.Gold -= item.Price;
+            AddItem(item);
+            Console.WriteLine($"You have bought {item.Name} for {item.Price} gold.");
+            return true;
+        }
+        public void SellItem(int idx)
+        {
+            Item item = Inventory.ElementAt(idx - 1);
+            this.Gold += item.Price;
+            RemoveItem(item);
+            Console.Clear();
+            Console.WriteLine($"You have sold {item.Name} for {item.Price} gold.");
+        }
+        public void BuyDrink(Item item)
+        {
+            Console.Clear();
+            if (this.Gold < item.Price)
+            {
+                Console.WriteLine("You don't have enough gold to buy this drink.");
+                return;
+            }
+            this.Gold -= item.Price;
+            this.SetCurrHealth(-item.Value);
+            Console.WriteLine($"You have drinked {item.Name} for {item.Price} gold and healed for {item.Value} health.");
         }
         public void EquipArmor(Item item)
         {
@@ -104,6 +153,10 @@ namespace SimpleConsoleAppGame
         {
             this.MainHand = item.Name;
             this.Attack = item.Value;
+        }
+        public void AddGold(int gold)
+        {
+            this.Gold += gold;
         }
         public void AttackEnemy(Enemy enemy)
         {

@@ -12,10 +12,17 @@ namespace SimpleConsoleAppGame
         {
             this.Name = "Dark Forest";
             this.Stage = 1;
-            this.Directions = new Dictionary<string, string>() { { "North", "Castle" }, { "South", "Village" } };
-            this.Items = new List<Item>() { new Item("HealthPotion", 20, ItemType.Potion, 60), new Item("ChainArmor", 6, ItemType.Armor, 25), new Item("SilverBow", 13, ItemType.Weapon, 10), new Item("GoldenSword", 15, ItemType.Weapon, 5) };
-            // this.Items = new Dictionary<string, int>() { { "HealthPotion", 20 }, {"ChainArmor", 6}, {"SilverBow", 13}, {"CritPotion", 5} };
-            //this.RewardOdds = new Dictionary<string, int>() { { "HealthPotion", 60 }, { "ChainArmor", 25 }, { "SilverBow", 10 }, { "CritPotion", 5 } };
+            this.Directions = new List<Destination>() {
+                new NorthCastle(),
+                new Tavern(this, new List<Item>()
+                {
+                    new Item("GoldenSword",13,5,ItemType.Weapon,null),
+                    new Item("GoldenArmor",7,6,ItemType.Armor,null),
+                    new Item("SilverBow",14,8,ItemType.Weapon,null),
+                    new Item("DwarvenArmor",10,11,ItemType.Armor,null),
+                })
+            };
+            this.Items = new List<Item>() { new Item("HealthPotion", 20, 2, ItemType.Potion, 60), new Item("ChainArmor", 6, 4, ItemType.Armor, 25), new Item("SilverBow", 14, 8, ItemType.Weapon, 10), new Item("GoldenSword", 15, 10, ItemType.Weapon, 5) };
             this.Enemies = new Dictionary<int, Enemy>()
             {
                 { 1, new Enemy("Goblin",35,8,2,5) },

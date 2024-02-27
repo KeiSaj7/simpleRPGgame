@@ -10,20 +10,21 @@ namespace SimpleConsoleAppGame
     {
         public string Name { get; set; }
         public int Stage { get; set; }
-        public Dictionary<string, string> Directions { get; set; }
+        public List<Destination> Directions { get; set; }
         public List<Item> Items { get; set; }
         // public Dictionary<string, int> Items { get; set; }
         public Dictionary<string, int> RewardOdds { get; set; }
         public Dictionary<int, Enemy> Enemies { get; set; }
 
-        public void StartLevel(Character character)
+        public virtual void StartLevel(Character character)
+        {
+            Console.Clear();
+            Choices(character);
+        }
+        public virtual void Choices(Character character)
         {
             Console.Clear();
             Console.WriteLine($"You have entered the {this.Name}. What would you like to do?");
-            Choices(character);
-        }
-        public void Choices(Character character)
-        {
             Console.WriteLine("1. Fight");
             Console.WriteLine("2. Check Inventory");
             Console.WriteLine("3. Check Stats");
@@ -32,26 +33,20 @@ namespace SimpleConsoleAppGame
             {
                 Console.WriteLine("Invalid choice, please try again.");
             }
+            Console.Clear();
             switch (choice)
             {
                 case 1:
-                    Console.Clear();
                     Fight(character);
                     break;
                 case 2:
-                    Console.Clear();
-                    character.ShowInventory();
-                    Console.WriteLine("Press any key to go back...");
-                    Console.ReadKey();
-                    Console.Clear();
+                    CheckInventory(character);
                     Choices(character);
                     break;
                 case 3:
-                    Console.Clear();
                     character.PrintStats();
                     Console.WriteLine("Press any key to go back...");
                     Console.ReadKey();
-                    Console.Clear();
                     Choices(character);
                     break;
             }
@@ -60,12 +55,7 @@ namespace SimpleConsoleAppGame
         }
 
         public void Fight(Character character)
-        {   if (this.Stage == 3)
-            {
-                Console.WriteLine("You have defeated the Dark Wizard and saved the kingdom! Congratulations!");
-                Console.ReadKey();
-                Environment.Exit(0);
-            }
+        {   
             Console.WriteLine($"You have encountered the {this.Enemies[Stage].Name}, prepare yourself to fight!\n");
             Console.WriteLine("Press any key to start the battle...");
             Console.ReadKey();
@@ -79,16 +69,33 @@ namespace SimpleConsoleAppGame
                 {
                     HPs = CalcHealth(character);
                     Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0 ? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0 ? 0 : HPs.Item1)}%");
-                    Console.WriteLine("You have slain an enemy!\n");
+                    Console.WriteLine("You have slain an enemy!");
                     if (this.Stage == 2) GetReward(character);
+                    DropGold(character, this.Enemies[Stage]);
                     this.Stage++;
                     Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                     Console.Clear();
-                    break;
+                    if (this.Stage > 3)
+                    {
+                        Console.WriteLine($"You have defeated the {this.Enemies[Stage - 1].Name} and now {this.Name} is safe! Congratulations!\n");
+                        Console.WriteLine($"Choose your next destination:");
+                        for (int i = 0; i < this.Directions.Count; i++)
+                        {
+                            Console.WriteLine($"{i + 1}.{this.Directions[i].Name}");
+                        }
+                        int choice;
+                        while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > this.Directions.Count)
+                        {
+                            Console.WriteLine("Invalid choice, please try again.");
+                        }
+                        this.GetDestination(choice - 1).StartLevel(character);
+                        Console.ReadKey();
+                    }
+                    else break;
                 }
                 this.Enemies[Stage].AttackEnemy(character, character.GetName(), character.GetDefense());
-                if (HPs.Item3 <= 0)
+                if (character.GetCurrHealth() <= 0)
                 {
                     HPs = CalcHealth(character);
                     Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0 ? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0 ? 0 : HPs.Item1)}%");
@@ -96,8 +103,6 @@ namespace SimpleConsoleAppGame
                     Console.ReadKey();
                     Environment.Exit(0);
                 }
-                
-                
             }
             Choices(character);
         }
@@ -119,8 +124,19 @@ namespace SimpleConsoleAppGame
                 case 2:
                     Console.Clear();
                     character.ShowInventory();
+                    character.UseItem();
                     break;
             }
+        }
+        public void CheckInventory(Character character)
+        {
+            bool exit = true;
+            while (exit)
+            {
+                character.ShowInventory();
+                exit = character.UseItem();
+            }
+
         }
         public (int,int,int) CalcHealth(Character character)
         {
@@ -150,6 +166,16 @@ namespace SimpleConsoleAppGame
             Item reward = this.Items.Find(x => x.Name == random);
             character.AddItem(reward);
             Console.WriteLine($"You have received {reward.Name}!");
+        }
+        public void DropGold(Character character, Enemy enemy)
+        {
+            int gold = enemy is Boss? new Random().Next(0, 6) : new Random().Next(0, 4);
+            character.AddGold(gold);
+            Console.WriteLine($"You have received {gold} gold for that fight!\n");
+        }
+        public Destination GetDestination(int idx)
+        {
+            return this.Directions[idx];
         }
     }
     public class Enemy

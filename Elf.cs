@@ -16,7 +16,7 @@ namespace SimpleConsoleAppGame
             this.CritChance = 15;
             this.MainHand = "WoodenBow";
             this.Armor = "BlackCoat";
-            this.Inventory = new List<Item>() {new Item("WoodenBow", 11, ItemType.Weapon, null), new Item("BlackCoat", 4, ItemType.Armor, null) };
+            this.Inventory = new List<Item>() {new Item("WoodenBow", 11, 1, ItemType.Weapon, null), new Item("BlackCoat", 4, 1, ItemType.Armor, null) };
             //this.Inventory = new Dictionary<string, int>() { { "WoodenBow", 11 }, { "BlackCoat", 4 } };
             this.Attack = this.Inventory.Find(x => x.Name == MainHand).Value;
             this.Defense = this.Inventory.Find(x => x.Name == Armor).Value;
