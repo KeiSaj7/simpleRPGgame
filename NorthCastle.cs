@@ -14,7 +14,10 @@ namespace SimpleConsoleAppGame
             this.Name = "North Castle";
             this.Stage = 1;
             this.Directions = new List<Destination>() {};
-            this.Items = new List<Item>() {};
+            this.Items = new List<Item>()
+            {
+                new Item("CritBlessing", 10, 20, ItemType.CritBuff, 1)
+            };
             this.Enemies = new Dictionary<int, Enemy>()
             {
 

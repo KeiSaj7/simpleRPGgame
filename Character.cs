@@ -28,6 +28,8 @@ namespace SimpleConsoleAppGame
                     return new Human(name);
                 case Race.Elf:
                     return new Elf(name);
+                case Race.Ninja:
+                    return new Ninja(name);
                 default:
                     throw new ArgumentException("Invalid race", nameof(race));
             }
@@ -59,6 +61,10 @@ namespace SimpleConsoleAppGame
             {
                 this.CurrentHealth = this.Health;
             }
+        }
+        public void IncreaseCritChance(int value)
+        {
+            this.CritChance += value;
         }
         public void AddItem(Item item)
         {
@@ -98,7 +104,9 @@ namespace SimpleConsoleAppGame
             while (!int.TryParse(Console.ReadLine(), out chosenIdx) || chosenIdx < 0 || chosenIdx > Inventory.Count)
             {
                 Console.Clear();
-                Console.WriteLine("Invalid choice, please try again.");
+                Console.WriteLine("Invalid choice, please try again.\n");
+                Console.WriteLine("Select an item to use/equip (type 0 to leave): ");
+                ShowInventory();
             }
             if (chosenIdx == 0)
             {
@@ -127,6 +135,10 @@ namespace SimpleConsoleAppGame
         public void SellItem(int idx)
         {
             Item item = Inventory.ElementAt(idx - 1);
+            if(item.Type != ItemType.Potion && this.Inventory.Count(i => i.Type == item.Type) <= 1) { 
+                Console.WriteLine("You can't sell your only weapon or armor.");
+                return;
+            }
             this.Gold += item.Price;
             RemoveItem(item);
             Console.Clear();

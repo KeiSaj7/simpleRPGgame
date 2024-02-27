@@ -70,7 +70,7 @@ namespace SimpleConsoleAppGame
                     HPs = CalcHealth(character);
                     Console.WriteLine(this.Enemies[Stage].Name + $" {PrintHealthBar(HPs.Item2)} {(HPs.Item2 < 0 ? 0 : HPs.Item2)}%               " + character.GetName() + $" {PrintHealthBar(HPs.Item1)} {(HPs.Item1 < 0 ? 0 : HPs.Item1)}%");
                     Console.WriteLine("You have slain an enemy!");
-                    if (this.Stage == 2) GetReward(character);
+                    GetReward(character);
                     DropGold(character, this.Enemies[Stage]);
                     this.Stage++;
                     Console.WriteLine("Press any key to continue...");
@@ -153,6 +153,11 @@ namespace SimpleConsoleAppGame
         }
         public void GetReward(Character character)
         {
+            int dropChance = new Random().Next(1, 101);
+            if (dropChance > 25)
+            {
+                return;
+            }
             Console.WriteLine("Your enemy dropped an item...");
             var rewards = new List<string>();
             foreach (var item in this.Items)

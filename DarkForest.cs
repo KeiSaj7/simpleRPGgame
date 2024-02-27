@@ -22,7 +22,14 @@ namespace SimpleConsoleAppGame
                     new Item("DwarvenArmor",10,11,ItemType.Armor,null),
                 })
             };
-            this.Items = new List<Item>() { new Item("HealthPotion", 20, 2, ItemType.Potion, 60), new Item("ChainArmor", 6, 4, ItemType.Armor, 25), new Item("SilverBow", 14, 8, ItemType.Weapon, 10), new Item("GoldenSword", 15, 10, ItemType.Weapon, 5) };
+            this.Items = new List<Item>() 
+            {
+                new Item("HealthPotion", 20, 2, ItemType.Potion, 60),
+                new Item("ChainArmor", 6, 4, ItemType.Armor, 25),
+                new Item("SilverBow", 14, 8, ItemType.Weapon, 10),
+                new Item("GoldenSword", 15, 10, ItemType.Weapon, 5),
+                new Item("CritBlessing", 10, 20, ItemType.CritBuff, 1) 
+            };
             this.Enemies = new Dictionary<int, Enemy>()
             {
                 { 1, new Enemy("Goblin",35,8,2,5) },

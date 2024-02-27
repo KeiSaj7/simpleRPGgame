@@ -29,9 +29,11 @@ namespace SimpleConsoleAppGame
             Console.WriteLine("1. Buy");
             Console.WriteLine("2. Sell");
             Console.WriteLine("3. Drink");
-            Console.WriteLine("4. Leave");
+            Console.WriteLine("4. Check Inventory");
+            Console.WriteLine("5. Check Stats");
+            Console.WriteLine("6. Leave");
             int choice;
-            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > 4)
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > 6)
             {
                 Console.WriteLine("Invalid choice, please try again.");
             }
@@ -51,6 +53,16 @@ namespace SimpleConsoleAppGame
                     Choices(character);
                     break;
                 case 4:
+                    CheckInventory(character);
+                    Choices(character);
+                    break;
+                case 5:
+                    character.PrintStats();
+                    Console.WriteLine("Press any key to go back...");
+                    Console.ReadKey();
+                    Choices(character);
+                    break;
+                case 6:
                     Leave(character);
                     Choices(character);
                     break;
@@ -67,9 +79,11 @@ namespace SimpleConsoleAppGame
                 {
                     Console.WriteLine($"{i + 1}. {Items[i].Name} | Price: {Items[i].Price} gold");
                 }
-                while (!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > Items.Count)
+                if(!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > Items.Count)
                 {
+                    Console.Clear();
                     Console.WriteLine("Invalid choice, please try again.");
+                    Buy(character);
                 }
                 if (choice == 0)
                 {
@@ -91,9 +105,11 @@ namespace SimpleConsoleAppGame
                 character.ShowGold();
                 Console.WriteLine("Which item do you want to sell?(type 0 to leave)");
                 character.ShowInventory();
-                while (!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > character.GetInventoryQuantity())
+                if (!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > character.GetInventoryQuantity())
                 {
+                    Console.Clear();
                     Console.WriteLine("Invalid choice, please try again.");
+                    Sell(character);
                 }
                 if (choice == 0)
                 {
@@ -113,9 +129,11 @@ namespace SimpleConsoleAppGame
                 {
                     Console.WriteLine($"{i + 1}. {Drinks[i].Name} | Price: {Drinks[i].Price} gold");
                 }
-                while (!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > Drinks.Count)
+                if(!int.TryParse(Console.ReadLine(), out choice) || choice < 0 || choice > Drinks.Count)
                 {
+                    Console.Clear();
                     Console.WriteLine("Invalid choice, please try again.");
+                    Drink(character);
                 }
                 if (choice == 0)
                 {

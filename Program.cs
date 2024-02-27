@@ -6,7 +6,8 @@ namespace SimpleConsoleAppGame
     public enum Race
     {
         Human,
-        Elf
+        Elf,
+        Ninja
     };
 
     class Program
