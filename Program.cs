@@ -43,11 +43,13 @@ namespace SimpleConsoleAppGame
             Console.Clear();
             Console.WriteLine($"You've chosen {chosenRace} race. Your basic statistics:" );
             character.PrintStats();
-           // character.ShowInventory();
             Console.WriteLine("Press any key to start the adventure...");
             Console.ReadKey();
             Console.Clear();
+
             DarkForest destination1 = new DarkForest();
+ 
+            destination1.StartLevel(character);
             Console.WriteLine($"Your first deistination is {destination1.Name}. Kill all enemies to complete this level. \n\nPress any key to enter the forest...");
             Console.ReadKey();
             destination1.StartLevel(character);

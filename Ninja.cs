@@ -11,18 +11,20 @@ namespace SimpleConsoleAppGame
         public Ninja(string name)
         {
             this.Name = name;
-            this.Health = 80;
+            this.Health = 1185;
             this.CurrentHealth = this.Health;
-            this.CritChance = 25;
-            this.MainHand = "Daggers";
-            this.Armor = "NinjaArmor";
+            this.CritChance = 30;
+            var mainHandItem = new Item("Daggers", 9, 1, ItemType.Weapon, null);
+            var armorItem = new Item("NinjaArmor", 5, 1, ItemType.Armor, null);
             this.Inventory = new List<Item>()
             {
-                new Item("Daggers", 9, 1, ItemType.Weapon, null),
-                new Item("NinjaArmor", 5, 1, ItemType.Armor, null)
+                mainHandItem,
+                armorItem
             };
-            this.Attack = this.Inventory.Find(x => x.Name == MainHand).Value;
-            this.Defense = this.Inventory.Find(x => x.Name == Armor).Value;
+            this.MainHand = mainHandItem.Id;
+            this.Armor = armorItem.Id;
+            this.Attack = this.Inventory.Find(x => x.Id == MainHand).Value;
+            this.Defense = this.Inventory.Find(x => x.Id == Armor).Value;
         }
     }
 }

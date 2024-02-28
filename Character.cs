@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace SimpleConsoleAppGame
         protected int Attack { get; set; }
         protected int Defense { get; set; }
         protected int CritChance { get; set; }
-        protected string MainHand { get; set; }
-        protected string Armor { get; set; }
+        protected Guid MainHand { get; set; }
+        protected Guid Armor { get; set; }
         protected int Gold { get; set; }    
         //protected Dictionary<string, int>? Inventory { get; set; }
         protected List<Item> Inventory { get; set; }
@@ -68,7 +69,7 @@ namespace SimpleConsoleAppGame
         }
         public void AddItem(Item item)
         {
-            Inventory.Add(item);
+            Inventory.Add(new Item(item.Name, item.Value, item.Price, item.Type, item.Odd));
         }   
         public void PrintStats()
         {
@@ -79,8 +80,8 @@ namespace SimpleConsoleAppGame
             string inventory = "Inventory:\n";
             for(int i = 0; i < Inventory.Count; i++)
             {
-                if(Inventory.ElementAt(i).Name == this.MainHand) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Main Hand]\n";
-                else if(Inventory.ElementAt(i).Name == this.Armor) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Armor]\n";
+                if(Inventory.ElementAt(i).Id == this.MainHand) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Main Hand]\n";
+                else if(Inventory.ElementAt(i).Id == this.Armor) inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold [Armor]\n";
                 else
                 {
                     inventory += $"{i + 1}. {Inventory.ElementAt(i).Name}: {Inventory.ElementAt(i).Value} | Price: {Inventory.ElementAt(i).Price} gold\n";
@@ -139,10 +140,16 @@ namespace SimpleConsoleAppGame
                 Console.WriteLine("You can't sell your only weapon or armor.");
                 return;
             }
+            if (item.Id == this.MainHand || item.Id == this.Armor)
+            {
+                Console.WriteLine("You can't sell equiped items!");
+                return;
+            }
             this.Gold += item.Price;
             RemoveItem(item);
             Console.Clear();
             Console.WriteLine($"You have sold {item.Name} for {item.Price} gold.");
+            return;
         }
         public void BuyDrink(Item item)
         {
@@ -154,16 +161,16 @@ namespace SimpleConsoleAppGame
             }
             this.Gold -= item.Price;
             this.SetCurrHealth(-item.Value);
-            Console.WriteLine($"You have drinked {item.Name} for {item.Price} gold and healed for {item.Value} health.");
+            Console.WriteLine($"You have drinked {item.Name} for {item.Price} gold and healed for {item.Value} Health.");
         }
         public void EquipArmor(Item item)
         {
-            this.Armor = item.Name;
+            this.Armor = item.Id;
             this.Defense = item.Value;
         }
         public void EquipWeapon(Item item)
         {
-            this.MainHand = item.Name;
+            this.MainHand = item.Id;
             this.Attack = item.Value;
         }
         public void AddGold(int gold)

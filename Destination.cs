@@ -76,7 +76,7 @@ namespace SimpleConsoleAppGame
                     Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                     Console.Clear();
-                    if (this.Stage > 3)
+                    if (this.Stage > this.Enemies.Count)
                     {
                         Console.WriteLine($"You have defeated the {this.Enemies[Stage - 1].Name} and now {this.Name} is safe! Congratulations!\n");
                         Console.WriteLine($"Choose your next destination:");
@@ -145,16 +145,16 @@ namespace SimpleConsoleAppGame
             int enemyHP = (this.Enemies[Stage].CurrentHealth * 100) / this.Enemies[Stage].Health;
             return (charHP,enemyHP,currHealth);
         }
-        public string PrintHealthBar(int health)
+        public string PrintHealthBar(int Health)
         {
-            int bars = health / 10;
-            string healthBar = new string('█', bars < 1? 1 : bars );
-            return healthBar;
+            int bars = Health / 10;
+            string HealthBar = new string('█', bars < 1? 1 : bars );
+            return HealthBar;
         }
         public void GetReward(Character character)
         {
             int dropChance = new Random().Next(1, 101);
-            if (dropChance > 25)
+            if (dropChance > 50)
             {
                 return;
             }
@@ -191,10 +191,10 @@ namespace SimpleConsoleAppGame
         public int Attack { get; set; }
         public int Defense { get; set; }
         public int CritChance { get; set; }
-        public Enemy(string name, int health, int attack, int defense, int critChance ) { 
+        public Enemy(string name, int Health, int attack, int defense, int critChance ) { 
             this.Name = name;   
-            this.Health = health;
-            this.CurrentHealth = health;
+            this.Health = Health;
+            this.CurrentHealth = Health;
             this.Attack = attack;
             this.Defense = defense;
             this.CritChance = critChance;
@@ -218,7 +218,7 @@ namespace SimpleConsoleAppGame
     public class Boss: Enemy
     {   
         public Dictionary<string, Tuple<int,int>> SpecialAbility { get; set; } // <Name, <Damage, Chance>>
-        public Boss(string name, int health, int attack, int defense, int critChance, Dictionary<string, Tuple<int, int>> specialAbility) : base(name, health, attack, defense, critChance)
+        public Boss(string name, int Health, int attack, int defense, int critChance, Dictionary<string, Tuple<int, int>> specialAbility) : base(name, Health, attack, defense, critChance)
         {
             this.SpecialAbility = specialAbility;
         }

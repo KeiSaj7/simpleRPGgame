@@ -14,8 +14,10 @@ namespace SimpleConsoleAppGame
         public int Price { get; set; }
         public ItemType Type { get; set; }
         public int? Odd { get; set; }
+        public Guid Id { get; set; }
         public Item(string name, int value, int price, ItemType type, int? odd)
         {
+            this.Id = Guid.NewGuid();
             this.Name = name;
             this.Value = value;
             this.Price = price;
@@ -45,6 +47,7 @@ namespace SimpleConsoleAppGame
             else if (this.Type == ItemType.CritBuff)
             {
                 Console.WriteLine($"You have used a {this.Name} and gained +{this.Value} Crit %.\n");
+                character.RemoveItem(this);
                 character.IncreaseCritChance(this.Value);
             }
         }
